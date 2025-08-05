@@ -1,12 +1,10 @@
 package net.javaguides.banking.dto;
-import lombok.AllArgsConstructor;
-import lombok.Data;
-import lombok.Getter;
-import lombok.Setter;
+import lombok.*;
 
 @Data
 @Getter
 @Setter
+@NoArgsConstructor
 @AllArgsConstructor
 public class AccountDto {
     private Long id;
