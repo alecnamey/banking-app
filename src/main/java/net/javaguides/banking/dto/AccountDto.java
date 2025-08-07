@@ -1,4 +1,5 @@
 package net.javaguides.banking.dto;
+import com.fasterxml.jackson.annotation.JsonProperty;
 import lombok.*;
 
 @Data
@@ -11,5 +12,6 @@ public class AccountDto {
     private String accountHolderName;
     private double balance;
     private String username;
+    @JsonProperty(access = JsonProperty.Access.WRITE_ONLY)
     private String password;
 }
