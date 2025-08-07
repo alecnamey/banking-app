@@ -5,7 +5,9 @@ import net.javaguides.banking.entity.Account;
 import net.javaguides.banking.mapper.AccountMapper;
 import net.javaguides.banking.respository.AccountRepository;
 import net.javaguides.banking.service.AccountService;
+import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
+
 
 import java.util.List;
 import java.util.stream.Collectors;
@@ -13,17 +15,23 @@ import java.util.stream.Collectors;
 @Service
 public class AccountServiceImpl implements AccountService {
     private AccountRepository accountRepository;
+    private final PasswordEncoder passwordEncoder;
 
 
-    public AccountServiceImpl(AccountRepository accountRepository) {
+    public AccountServiceImpl(AccountRepository accountRepository, PasswordEncoder passwordEncoder) {
         this.accountRepository = accountRepository;
+        this.passwordEncoder = passwordEncoder;
     }
 
     @Override
     public AccountDto createAccount(AccountDto accountDto) {
-        Account account = AccountMapper.mapToAccount(accountDto);
-        Account savedAccount = accountRepository.save(account);
-        return AccountMapper.mapToAccountDto(savedAccount);
+        String hashed = passwordEncoder.encode(accountDto.getPassword());
+        accountDto.setPassword(hashed);
+
+        Account saved = accountRepository.save(AccountMapper.mapToAccount(accountDto));
+        AccountDto dto = AccountMapper.mapToAccountDto(saved);
+        dto.setPassword(null); // don’t return the hash
+        return dto;
     }
 
     @Override
