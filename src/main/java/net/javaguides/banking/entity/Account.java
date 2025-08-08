@@ -24,5 +24,6 @@ public class Account {
     private double balance;
     private String username;
     private String password;
+    private String email;
 
 }

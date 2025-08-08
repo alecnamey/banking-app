@@ -12,6 +12,7 @@ public class AccountDto {
     private String accountHolderName;
     private double balance;
     private String username;
+    private String email;
     @JsonProperty(access = JsonProperty.Access.WRITE_ONLY)
     private String password;
 }

@@ -11,7 +11,8 @@ public class AccountMapper {
                 accountDto.getAccountHolderName(),
                 accountDto.getBalance(),
                 accountDto.getUsername(),
-                accountDto.getPassword()
+                accountDto.getPassword(),
+                accountDto.getEmail()
         );
         return account;
     }
@@ -21,7 +22,8 @@ public class AccountMapper {
                 account.getAccountHolderName(),
                 account.getBalance(),
                 account.getUsername(),
-                account.getPassword()
+                account.getPassword(),
+                account.getEmail()
         );
         return accountDto;
     }
