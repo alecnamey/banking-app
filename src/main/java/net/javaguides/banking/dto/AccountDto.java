@@ -1,18 +1,23 @@
 package net.javaguides.banking.dto;
+
 import com.fasterxml.jackson.annotation.JsonProperty;
 import lombok.*;
 
+import java.math.BigDecimal;
+
 @Data
-@Getter
-@Setter
 @NoArgsConstructor
 @AllArgsConstructor
+@Builder
 public class AccountDto {
     private Long id;
-    private String accountHolderName;
-    private double balance;
+    private String firstName;
+    private String lastName;
+    private BigDecimal balance;
     private String username;
     private String email;
+    private String phone;
+
     @JsonProperty(access = JsonProperty.Access.WRITE_ONLY)
-    private String password;
+    private String password; // raw from client for registration only
 }

@@ -8,15 +8,15 @@ import net.javaguides.banking.service.AccountService;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
-
+import java.math.BigDecimal;
 import java.util.List;
 import java.util.stream.Collectors;
 
 @Service
 public class AccountServiceImpl implements AccountService {
-    private AccountRepository accountRepository;
-    private final PasswordEncoder passwordEncoder;
 
+    private final AccountRepository accountRepository;
+    private final PasswordEncoder passwordEncoder;
 
     public AccountServiceImpl(AccountRepository accountRepository, PasswordEncoder passwordEncoder) {
         this.accountRepository = accountRepository;
@@ -25,60 +25,67 @@ public class AccountServiceImpl implements AccountService {
 
     @Override
     public AccountDto createAccount(AccountDto accountDto) {
+        // Encode raw password from DTO
         String hashed = passwordEncoder.encode(accountDto.getPassword());
-        accountDto.setPassword(hashed);
 
-        Account saved = accountRepository.save(AccountMapper.mapToAccount(accountDto));
-        AccountDto dto = AccountMapper.mapToAccountDto(saved);
-        dto.setPassword(null); // don’t return the hash
-        return dto;
+        // Map DTO to Entity with hashed password
+        Account account = AccountMapper.toEntity(accountDto, hashed);
+
+        // Save to DB
+        Account saved = accountRepository.save(account);
+
+        // Return DTO (password will be null because mapper doesn't set it)
+        return AccountMapper.toDto(saved);
     }
 
     @Override
     public AccountDto getAccountById(Long id) {
-        Account account = accountRepository
-                .findById(id)
+        Account account = accountRepository.findById(id)
                 .orElseThrow(() -> new RuntimeException("Account does not exist."));
-        return AccountMapper.mapToAccountDto(account);
+        return AccountMapper.toDto(account);
     }
 
     @Override
     public AccountDto deposit(Long id, double amount) {
-        Account account = accountRepository
-                .findById(id)
+        Account account = accountRepository.findById(id)
                 .orElseThrow(() -> new RuntimeException("Account does not exist."));
-        double total = account.getBalance() + amount;
-        account.setBalance(total);
-        Account savedAccount = accountRepository.save(account);
-        return AccountMapper.mapToAccountDto(savedAccount);
+
+        BigDecimal newTotal = account.getBalance().add(BigDecimal.valueOf(amount));
+        account.setBalance(newTotal);
+
+        Account saved = accountRepository.save(account);
+        return AccountMapper.toDto(saved);
     }
 
-    public AccountDto withdraw(Long id, double amount){
-        Account account = accountRepository
-                .findById(id)
+    @Override
+    public AccountDto withdraw(Long id, double amount) {
+        Account account = accountRepository.findById(id)
                 .orElseThrow(() -> new RuntimeException("Account does not exist."));
-        if(account.getBalance() < amount){
-            throw new RuntimeException("Insufficient amount");
+
+        if (account.getBalance().compareTo(BigDecimal.valueOf(amount)) < 0) {
+            throw new RuntimeException("Insufficient funds");
         }
-        double total = account.getBalance() - amount;
-        account.setBalance(total);
-        Account savedAccount = accountRepository.save(account);
-        return AccountMapper.mapToAccountDto((savedAccount));
+
+        BigDecimal newTotal = account.getBalance().subtract(BigDecimal.valueOf(amount));
+        account.setBalance(newTotal);
+
+        Account saved = accountRepository.save(account);
+        return AccountMapper.toDto(saved);
     }
 
     @Override
     public List<AccountDto> getAllAccounts() {
-        List<Account> accounts = accountRepository.findAll();
-        return accounts.stream().map((account) -> AccountMapper.mapToAccountDto(account))
+        return accountRepository.findAll()
+                .stream()
+                .map(AccountMapper::toDto)
                 .collect(Collectors.toList());
     }
 
     @Override
     public void deleteAccount(Long id) {
-        Account account = accountRepository
-                .findById(id)
-                .orElseThrow(() -> new RuntimeException("Account does not exist."));
+        if (!accountRepository.existsById(id)) {
+            throw new RuntimeException("Account does not exist.");
+        }
         accountRepository.deleteById(id);
     }
-
 }
