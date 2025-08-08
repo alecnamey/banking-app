@@ -120,3 +120,4 @@ export default function Register({ onBack, onSubmit, homePath = "/" }) {
         </div>
     );
 }
+// password and username concatinated
