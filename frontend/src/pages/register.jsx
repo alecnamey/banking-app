@@ -1,123 +1,160 @@
 import React, { useState } from "react";
+import { useNavigate } from "react-router-dom";
 import "./register.css";
-// If you're using React Router and prefer a Link, you can import it:
-// import { Link } from "react-router-dom";
 
-export default function Register({ onBack, onSubmit, homePath = "/" }) {
-    const [form, setForm] = useState({
-        firstName: "",
-        lastName: "",
-        username: "",
-        password: "",
-        confirmPassword: "",
-    });
+export default function Register({ onRegister }) {
+    const navigate = useNavigate();
 
-    const update = (e) =>
-        setForm((f) => ({ ...f, [e.target.name]: e.target.value }));
+    const [firstName, setFirstName] = useState("");
+    const [lastName, setLastName] = useState("");
+    const [phone, setPhone] = useState("");
+    const [username, setUsername] = useState("");
+    const [email, setEmail] = useState("");
+    const [password, setPassword] = useState("");
+    const [confirmPassword, setConfirmPassword] = useState("");
 
-    const handleBack = () => {
-        if (onBack) return onBack();
+    // Password validation regex
+    const passwordRegex = /^(?=.*[A-Z])(?=.*[!@#$%&*]).{8,}$/;
+
+    // ...imports and useState hooks remain the same
+
+// ✅ REPLACE your current handleSubmit with this one
+    const handleSubmit = async (e) => {
+        e.preventDefault();
+
+        if (!passwordRegex.test(password)) {
+            alert("Password must be at least 8 chars, include 1 uppercase & 1 special (!@#$%&*).");
+            return;
+        }
+        if (password !== confirmPassword) {
+            alert("Passwords do not match!");
+            return;
+        }
+
         try {
-            if (window.history.length > 1) {
-                window.history.back();
-            } else {
-                window.location.assign(homePath);
+            const res = await fetch("http://localhost:8080/api/auth/register", {
+                method: "POST",
+                headers: { "Content-Type": "application/json" },
+                body: JSON.stringify({
+                    firstName,
+                    lastName,
+                    phone,
+                    username,
+                    email,
+                    password
+                }),
+                credentials: "include" // only if using cookies/sessions
+            });
+
+            if (!res.ok) {
+                const err = await res.text();
+                throw new Error(err || "Registration failed");
             }
-        } catch {
-            window.location.assign(homePath);
+
+            alert("Registered! You can log in now.");
+            navigate("/");
+        } catch (err) {
+            alert(err.message);
         }
     };
 
-    const handleSubmit = (e) => {
-        e.preventDefault();
-        if (onSubmit) onSubmit(form);
-        // add your submit logic here
-    };
 
     return (
-        <div className="bank-page">
-            <div className="bank-frame">
-                <button type="button" className="back-btn" onClick={handleBack}>
-                    ← back
-                </button>
+        <div className="register-page">
+            <div className="register-frame">
+                <h1 className="register-title">Create Your Account</h1>
 
-                <h1 className="bank-title">Bank of Alec</h1>
-
-                <form className="login-form" onSubmit={handleSubmit}>
+                <form className="register-form" onSubmit={handleSubmit}>
                     <div className="form-row">
-                        <label htmlFor="firstName" className="form-label">First Name:</label>
+                        <label>First Name</label>
                         <input
-                            id="firstName"
-                            name="firstName"
                             type="text"
-                            className="form-input"
-                            value={form.firstName}
-                            onChange={update}
-                            autoComplete="given-name"
+                            value={firstName}
+                            onChange={(e) => setFirstName(e.target.value)}
+                            placeholder="Enter first name"
+                            required
                         />
                     </div>
 
                     <div className="form-row">
-                        <label htmlFor="lastName" className="form-label">Last Name:</label>
+                        <label>Last Name</label>
                         <input
-                            id="lastName"
-                            name="lastName"
                             type="text"
-                            className="form-input"
-                            value={form.lastName}
-                            onChange={update}
-                            autoComplete="family-name"
+                            value={lastName}
+                            onChange={(e) => setLastName(e.target.value)}
+                            placeholder="Enter last name"
+                            required
                         />
                     </div>
 
                     <div className="form-row">
-                        <label htmlFor="username" className="form-label">UserName:</label>
+                        <label>Phone Number</label>
                         <input
-                            id="username"
-                            name="username"
-                            type="text"
-                            className="form-input"
-                            value={form.username}
-                            onChange={update}
-                            autoComplete="username"
+                            type="tel"
+                            value={phone}
+                            onChange={(e) => setPhone(e.target.value)}
+                            placeholder="Enter phone number"
+                            required
                         />
                     </div>
 
                     <div className="form-row">
-                        <label htmlFor="password" className="form-label">Password:</label>
+                        <label>Username</label>
                         <input
-                            id="password"
-                            name="password"
+                            type="text"
+                            value={username}
+                            onChange={(e) => setUsername(e.target.value)}
+                            placeholder="Enter username"
+                            required
+                        />
+                    </div>
+
+                    <div className="form-row">
+                        <label>Email</label>
+                        <input
+                            type="email"
+                            value={email}
+                            onChange={(e) => setEmail(e.target.value)}
+                            placeholder="Enter email"
+                            required
+                        />
+                    </div>
+
+                    <div className="form-row">
+                        <label>Password</label>
+                        <input
                             type="password"
-                            className="form-input"
-                            value={form.password}
-                            onChange={update}
-                            autoComplete="new-password"
+                            value={password}
+                            onChange={(e) => setPassword(e.target.value)}
+                            placeholder="Enter password"
+                            required
                         />
                     </div>
 
                     <div className="form-row">
-                        <label htmlFor="confirmPassword" className="form-label">Confirm Password:</label>
-                        <div className="input-with-action">
-                            <input
-                                id="confirmPassword"
-                                name="confirmPassword"
-                                type="password"
-                                className="form-input"
-                                value={form.confirmPassword}
-                                onChange={update}
-                                autoComplete="new-password"
-                            />
-                            <button type="submit" className="create-btn">create</button>
-                        </div>
+                        <label>Confirm Password</label>
+                        <input
+                            type="password"
+                            value={confirmPassword}
+                            onChange={(e) => setConfirmPassword(e.target.value)}
+                            placeholder="Re-enter password"
+                            required
+                        />
                     </div>
-                </form>
 
-                {/* If you want a pure Link back (SPA), uncomment and use this inside Router:
-        <Link to={homePath} className="back-link">← back</Link>
-        */}
+                    <button type="submit" className="register-btn">
+                        Register
+                    </button>
+
+                    <button
+                        type="button"
+                        className="back-btn"
+                        onClick={() => navigate("/")}
+                    >
+                        Back to Home
+                    </button>
+                </form>
             </div>
         </div>
     );
 }
-// password and username concatinated
