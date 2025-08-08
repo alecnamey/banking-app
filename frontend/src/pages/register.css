@@ -1,0 +1,111 @@
+/* Page layout */
+.bank-page {
+    min-height: 100vh;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background: #fafafa;
+}
+
+/* Outer frame */
+.bank-frame {
+    width: min(1000px, 92vw);
+    background: #fff;
+    border: 10px solid #111;
+    border-radius: 22px;
+    padding: clamp(24px, 5vw, 56px);
+    box-shadow: 0 12px 24px rgba(0,0,0,.06);
+
+    /* Narrower shared width for all inputs */
+    --field-width: clamp(260px, 42vw, 460px);
+}
+
+/* Back button (top-left inside the frame) */
+.back-btn {
+    /* stop flex from making it full-width */
+    align-self: flex-start;
+    display: inline-flex;
+    white-space: nowrap;
+    width: auto;                /* hug content */
+    /* your existing look */
+    background: #eaeaea;
+    border: 3px solid #111;
+    border-radius: 1px;
+    font-size: clamp(14px, 2.6vw, 20px);
+    font-weight: 900;
+    padding: 6px 8px;          /* a bit tighter */
+    color: #111;
+    cursor: pointer;
+    text-decoration: none;     /* no underline */
+}
+
+
+
+/* Title (centered, smaller) */
+.bank-title {
+    margin: 0 0 clamp(28px, 5vw, 56px);
+    font-size: clamp(34px, 5.5vw, 64px);
+    line-height: 1.05;
+    font-weight: 900;
+    color: #f59e0b;
+    letter-spacing: 1.5px;
+    text-align: center;
+}
+
+/* Form rows */
+.login-form .form-row {
+    display: flex;
+    align-items: center;
+    gap: clamp(12px, 2.6vw, 22px);
+    margin: 0 0 clamp(16px, 3.5vw, 28px);
+}
+
+.form-label {
+    font-size: clamp(18px, 3vw, 32px);
+    font-weight: 800;
+    color: #111;
+    white-space: nowrap;
+}
+
+/* Inputs: same size, smaller */
+.form-input {
+    width: var(--field-width);
+    flex: 0 0 var(--field-width);
+    height: clamp(40px, 5.8vw, 56px);
+    background: #eaeaea;
+    border: 4px solid #222;
+    border-radius: 10px;
+    padding: 0 14px;
+    font-size: clamp(16px, 2.2vw, 20px);
+    outline: none;
+    max-width: none;
+}
+
+.form-input:focus {
+    background: #f5f5f5;
+    box-shadow: 0 0 0 4px rgba(245, 158, 11, 0.12);
+}
+
+/* "create" button positioned like the login "enter" */
+.input-with-action {
+    position: relative;
+    display: inline-flex;
+    align-items: center;
+}
+
+.create-btn {
+    position: absolute;
+    left: calc(100% + 20px);
+    top: 50%;
+    transform: translateY(-50%);
+    background: #eaeaea;
+    border: 4px solid #111;
+    border-radius: 12px;
+    color: #dc2626;
+    font-weight: 900;
+    font-size: clamp(20px, 3.2vw, 26px);
+    padding: 8px 14px;
+    cursor: pointer;
+}
+
+.create-btn:hover { filter: brightness(0.95); }
